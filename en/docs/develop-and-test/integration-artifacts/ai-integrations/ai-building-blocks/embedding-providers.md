@@ -31,7 +31,7 @@ You rarely call these directly. Knowledge Base `ingest` and `retrieve` operation
 In the **Create Vector Knowledge Base** form, click **+ Create New Embedding Model**. The **Select Embedding Provider** picker shows the supported providers.
 
 <ThemedImage
-    alt="Select Embedding Provider picker listing Default Embedding Provider (WSO2) at the top, then the Bedrock Titan and Bedrock Cohere embedding providers, Azure Embedding Provider, Google Vertex Embedding Provider, OpenAI Embedding Provider, and OpenRouter Embedding Provider, each with a one-line description."
+    alt="Select Embedding Provider picker listing Default Embedding Provider (WSO2) at the top, then the Bedrock Embedding Providers group (2 options) expanded to show Bedrock Cohere Embedding Provider and Bedrock Titan Embedding Provider, followed by Azure Embedding Provider, Gemini Embedding Provider, Google Vertex Embedding Provider, OpenAI Embedding Provider, and OpenRouter Embedding Provider, each with a one-line description."
     sources={{
         light: useBaseUrl('/img/genai/develop/components/embedding-providers/01-select-list-v5.1.0.png'),
         dark: useBaseUrl('/img/genai/develop/components/embedding-providers/01-select-list-v5.1.0.png'),
@@ -71,27 +71,28 @@ This provider has no provider-specific fields and no advanced configurations.
 
 ## AWS Bedrock
 
-Amazon Bedrock serves Amazon Titan and Cohere embedding models from your own AWS account and region. The package ships one embedding provider per vendor: **Bedrock Titan Embedding Provider** and **Bedrock Cohere Embedding Provider**.
+Amazon Bedrock serves Amazon Titan and Cohere embedding models from your own AWS account and region. The package ships one embedding provider per vendor: **Bedrock Titan Embedding Provider** and **Bedrock Cohere Embedding Provider**. In the **Select Embedding Provider** picker, both are grouped under one **Bedrock Embedding Providers** card.
 
 Official website: [aws.amazon.com/bedrock](https://aws.amazon.com/bedrock/).
 
 ### Create form
 
 <ThemedImage
-    alt="Create Embedding Provider form for the Bedrock Titan Embedding Provider showing three required fields: Model, AWS Credentials, and Region. Below: Advanced Configurations Expand link, Embedding Provider Name, and Result Type bedrock:TitanEmbeddingProvider."
+    alt="Create Embedding Provider form for the Bedrock Titan Embedding Provider showing three required fields: Model (select/expression toggle), AWS Credentials (record/expression toggle, with hint 'AWS credentials, or auth:DEFAULT_CREDENTIALS for the default chain'), and Region (select/expression toggle), then the optional Endpoint Configuration. Below: Advanced Configurations Expand link and Embedding Provider Name bedrockTitanembeddingprovider."
     sources={{
         light: useBaseUrl('/img/genai/develop/components/embedding-providers/11-aws-bedrock-titan-basic-v5.1.0.png'),
         dark: useBaseUrl('/img/genai/develop/components/embedding-providers/11-aws-bedrock-titan-basic-v5.1.0.png'),
     }}
 />
 
-Both AWS Bedrock embedding providers have the same three required fields.
+Both AWS Bedrock embedding providers have the same create form fields.
 
 | Field | Required | Default | Available values |
 |---|---|---|---|
 | **Model** | Yes | — | **Titan**: `amazon.titan-embed-text-v2:0` (1024 dims, configurable down), `amazon.titan-embed-text-v1` (1536 dims). **Cohere**: `cohere.embed-english-v3` (1024 dims), `cohere.embed-multilingual-v3` (1024 dims), `cohere.embed-v4:0` (1536 dims, configurable down). Any other model ID from the same vendor is also accepted. ARNs are not supported. |
 | **AWS Credentials** | Yes | — | `DEFAULT_CREDENTIALS`, or one of the records in [AWS credential options](model-providers.md#aws-credential-options). |
 | **Region** | Yes | — | The AWS region to call, for example `us-east-1`. There is no default. |
+| **Endpoint Configuration** | No | `()` (derived from Region) | `fips`, `dualstack`, `customEndpoint`. Endpoint variant, or a full URL override such as a VPC endpoint. |
 
 :::note
 `cohere.embed-v4:0` is served in-region only in `us-east-1`, `eu-west-1`, and `ap-northeast-1`. In other regions, use a cross-region inference profile ID instead: `us.cohere.embed-v4:0`, `eu.cohere.embed-v4:0`, or `global.cohere.embed-v4:0`. See the [Embed v4 model card](https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-cohere-embed-v4.html).
@@ -100,7 +101,7 @@ Both AWS Bedrock embedding providers have the same three required fields.
 ### Advanced configurations
 
 <ThemedImage
-    alt="Bedrock Cohere Create Embedding Provider form with Advanced Configurations expanded showing Endpoint Configuration, Input Type (default SEARCH_DOCUMENT), Truncate, Dimensions, Additional Model Request Fields, Retry Config, and HTTP Config."
+    alt="Bedrock Cohere Create Embedding Provider form with Advanced Configurations expanded, scrolled to show Truncate, Dimensions, Additional Model Request Fields, Retry Config, and HTTP Config, followed by Embedding Provider Name bedrockCohereembeddingprovider and Result Type bedrock:CohereEmbeddingProvider."
     sources={{
         light: useBaseUrl('/img/genai/develop/components/embedding-providers/12-aws-bedrock-cohere-advanced-v5.1.0.png'),
         dark: useBaseUrl('/img/genai/develop/components/embedding-providers/12-aws-bedrock-cohere-advanced-v5.1.0.png'),
@@ -109,7 +110,6 @@ Both AWS Bedrock embedding providers have the same three required fields.
 
 | Field | Provider | Default | Available values | What it controls |
 |---|---|---|---|---|
-| **Endpoint Configuration** | Both | `()` (derived from Region) | `fips`, `dualstack`, `customEndpoint` | Endpoint variant, or a full URL override such as a VPC endpoint. |
 | **Input Type** | Cohere | `SEARCH_DOCUMENT` | `SEARCH_DOCUMENT`, `SEARCH_QUERY`, `CLASSIFICATION`, `CLUSTERING` | What the embeddings are for. Cohere requires this on every request. |
 | **Truncate** | Cohere | `()` (model default) | `TRUNCATE_NONE`, `TRUNCATE_START`, `TRUNCATE_END` | How over-long input is handled. `TRUNCATE_NONE` returns an error; the other two drop tokens from the start or the end. |
 | **Dimensions** | Both | `()` (model default) | Titan V2: `256`, `512`, `1024`. Cohere Embed v4: `256`, `512`, `1024`, `1536`. | Output vector size. Must match the dimension of your vector store index. Setting it on Titan V1 or Cohere Embed v3 fails when the provider is created. |
