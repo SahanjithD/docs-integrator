@@ -179,7 +179,7 @@ Bedrock serves models through two endpoints, and the package ships a separate mo
 
 In the **Select Model Provider** picker, all of these are grouped under one **Bedrock Model Providers** card. Expand it to choose a provider, for example **Bedrock Runtime Anthropic Model Provider** or **Bedrock Mantle OpenAI Model Provider**.
 
-**Bedrock Common** accepts any Bedrock model ID and calls it through the Converse API. Use it for vendors that have no provider of their own, such as Meta, Cohere, AI21, and Writer.
+**Bedrock Common** accepts any Bedrock model ID and calls it through the Converse API. Use it for vendors that have no provider of their own, such as Meta, Writer, xAI, Moonshot AI, MiniMax, NVIDIA, and Z.AI.
 
 :::warning
 Bedrock Mantle uses a separate IAM permission, **`bedrock-mantle:CreateInference`**. A role that can call Bedrock Runtime (`bedrock:InvokeModel`) still gets `AccessDenied` on Mantle until you grant it. If you authenticate with a Bedrock API key, Mantle also needs **`bedrock-mantle:CallWithBearerToken`**. See [Amazon Bedrock powered by AWS Mantle](https://docs.aws.amazon.com/service-authorization/latest/reference/list_bedrock-mantle.html).
@@ -216,10 +216,10 @@ Model IDs each provider knows about:
 | **DeepSeek** | `us.deepseek.r1-v1:0`, `deepseek.v3.2` | `deepseek.v3.2` |
 | **Bedrock Common** | Any model ID | - |
 
-`google.gemma-3-27b-it` is a Legacy model on Bedrock, with an end-of-life date of March 30, 2027.
+These models are Legacy on Bedrock, with an end-of-life date of March 30, 2027: `google.gemma-3-4b-it`, `google.gemma-3-12b-it`, `google.gemma-3-27b-it`, `mistral.mistral-7b-instruct-v0:2`, `qwen.qwen3-coder-480b-a35b-v1:0`, and `us.deepseek.r1-v1:0`.
 
 :::note
-IDs that start with `us.` are US cross-region inference profiles and work only when **Region** is a US region. In other regions, type the profile ID for your geography instead, for example `eu.anthropic.claude-haiku-4-5-20251001-v1:0` or `global.anthropic.claude-haiku-4-5-20251001-v1:0`. Current Claude models on Bedrock Runtime are available only through these profiles, so a bare `anthropic.` ID is refused there.
+IDs that start with `us.` are US cross-region inference profiles and work only when **Region** is a US region. In other regions, type the profile ID for your geography instead, for example `eu.anthropic.claude-haiku-4-5-20251001-v1:0` or `global.anthropic.claude-haiku-4-5-20251001-v1:0`. Most current Claude models on Bedrock Runtime are served only through these profiles, and AWS rejects the bare `anthropic.` ID. A few accept the bare ID in specific regions only; check the model's card in [Amazon Bedrock models](https://docs.aws.amazon.com/bedrock/latest/userguide/model-cards.html).
 :::
 
 ### Advanced configurations
