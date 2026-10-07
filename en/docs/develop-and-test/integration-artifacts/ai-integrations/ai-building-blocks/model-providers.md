@@ -265,7 +265,7 @@ All fields across the AWS Bedrock model providers:
 | **Maximum Tokens** | `4096` | Any positive integer, or empty | Hard cap on response length. Leave empty to use the model's own limit. |
 | **Temperature** | `()` (omitted from request) | Model-specific, or empty | Sampling temperature. Leave empty to use the model's default. |
 | **Stop Sequences** | `()` | String array | Stop sequences for every call. A per-call **Stop** overrides these. |
-| **Additional Model Request Fields** | `()` | JSON map | Extra request fields sent to Bedrock unchanged. |
+| **Additional Model Request Fields** | `()` | Open record, for example `{"top_p": 0.9}` | Extra request fields sent to Bedrock unchanged. |
 | **Guardrail** | `()` | `guardrailIdentifier`, `guardrailVersion` | Applies an Amazon Bedrock guardrail. Bedrock Runtime only. |
 | **Service Tier** | `()` | `TIER_DEFAULT`, `TIER_PRIORITY`, `TIER_FLEX`, `TIER_RESERVED` | Bedrock processing tier. Bedrock Runtime only. |
 | **Latency Optimized** | `()` | `true`, `false` | Requests latency-optimized inference where the model and region support it. Bedrock Runtime only. |

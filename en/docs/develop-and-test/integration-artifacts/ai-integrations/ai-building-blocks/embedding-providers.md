@@ -89,7 +89,7 @@ Both AWS Bedrock embedding providers have the same create form fields, except **
 
 | Field | Required | Default | Available values |
 |---|---|---|---|
-| **Model** | Yes | — | **Titan**: `amazon.titan-embed-text-v2:0` (1024 dims, configurable down), `amazon.titan-embed-text-v1` (1536 dims). **Cohere**: `cohere.embed-english-v3` (1024 dims), `cohere.embed-multilingual-v3` (1024 dims), `cohere.embed-v4:0` (1536 dims, configurable down). Any other ID that starts with `amazon.titan-embed` (Titan) or `cohere.embed` (Cohere) is also accepted, including cross-region inference profile IDs such as `us.cohere.embed-v4:0`. ARNs are not supported. |
+| **Model** | Yes | — | **Titan**: `amazon.titan-embed-text-v2:0` (1024 dims, configurable down), `amazon.titan-embed-text-v1` (1536 dims). **Cohere**: `cohere.embed-english-v3` (1024 dims), `cohere.embed-multilingual-v3` (1024 dims), `cohere.embed-v4:0` (1536 dims, configurable down). Any other ID that starts with `amazon.titan-embed` (Titan) or `cohere.embed` (Cohere) is also accepted, including cross-region inference profile IDs such as `us.cohere.embed-v4:0`. |
 | **AWS Credentials** | Yes | — | `DEFAULT_CREDENTIALS`, or one of the records in [AWS credential options](model-providers.md#aws-credential-options). |
 | **Region** | Yes | — | The AWS region to call, for example `us-east-1`. There is no default. |
 | **Endpoint Configuration** | No | `()` (derived from Region) | `fips`, `dualstack`, `customEndpoint`. Endpoint variant, or a full URL override such as a VPC endpoint. |
@@ -114,7 +114,7 @@ Both AWS Bedrock embedding providers have the same create form fields, except **
 | **Truncate** | Cohere | `()` (model default) | `TRUNCATE_NONE`, `TRUNCATE_START`, `TRUNCATE_END` | How over-long input is handled. `TRUNCATE_NONE` returns an error; the other two drop tokens from the start or the end. |
 | **Dimensions** | Both | `()` (model default) | Titan V2: `256`, `512`, `1024`. Cohere Embed v4: `256`, `512`, `1024`, `1536`. | Output vector size. Must match the dimension of your vector store index. Setting it on Titan V1 or Cohere Embed v3 fails when the provider is created. |
 | **Normalize** | Titan | `()` (`true` on Titan V2) | `true`, `false` | Whether Titan returns a unit-length vector. |
-| **Additional Model Request Fields** | Both | `()` | JSON map | Extra request fields sent to Bedrock unchanged. |
+| **Additional Model Request Fields** | Both | `()` | Open record, for example `{"top_p": 0.9}` | Extra request fields sent to Bedrock unchanged. |
 | **Retry Config** | Both | `maxRetries` 3, `initialDelay` 1.0, `maxDelay` 20.0, `backoffFactor` 2.0 | Record | Backoff for throttling and transient errors (408, 429, 500, 502, 503, 504). |
 | **HTTP Config** | Both | `{}` | Record | The [Standard HTTP advanced configurations](model-providers.md#standard-http-advanced-configurations), grouped in one record. There is no **Service URL**; use **Endpoint Configuration**. |
 
