@@ -85,14 +85,15 @@ Official website: [aws.amazon.com/bedrock](https://aws.amazon.com/bedrock/).
     }}
 />
 
-Both AWS Bedrock embedding providers have the same create form fields.
+Both AWS Bedrock embedding providers have the same create form fields, except **Input Type**, which only the Cohere provider has.
 
 | Field | Required | Default | Available values |
 |---|---|---|---|
-| **Model** | Yes | — | **Titan**: `amazon.titan-embed-text-v2:0` (1024 dims, configurable down), `amazon.titan-embed-text-v1` (1536 dims). **Cohere**: `cohere.embed-english-v3` (1024 dims), `cohere.embed-multilingual-v3` (1024 dims), `cohere.embed-v4:0` (1536 dims, configurable down). Any other model ID from the same vendor is also accepted. ARNs are not supported. |
+| **Model** | Yes | — | **Titan**: `amazon.titan-embed-text-v2:0` (1024 dims, configurable down), `amazon.titan-embed-text-v1` (1536 dims). **Cohere**: `cohere.embed-english-v3` (1024 dims), `cohere.embed-multilingual-v3` (1024 dims), `cohere.embed-v4:0` (1536 dims, configurable down). Any other ID that starts with `amazon.titan-embed` (Titan) or `cohere.embed` (Cohere) is also accepted, including cross-region inference profile IDs such as `us.cohere.embed-v4:0`. ARNs are not supported. |
 | **AWS Credentials** | Yes | — | `DEFAULT_CREDENTIALS`, or one of the records in [AWS credential options](model-providers.md#aws-credential-options). |
 | **Region** | Yes | — | The AWS region to call, for example `us-east-1`. There is no default. |
 | **Endpoint Configuration** | No | `()` (derived from Region) | `fips`, `dualstack`, `customEndpoint`. Endpoint variant, or a full URL override such as a VPC endpoint. |
+| **Input Type** (Cohere only) | No | `SEARCH_DOCUMENT` | `SEARCH_DOCUMENT`, `SEARCH_QUERY`, `CLASSIFICATION`, `CLUSTERING`. What the embeddings are for. Cohere requires this on every request, so the provider always sends it. |
 
 :::note
 `cohere.embed-v4:0` is served in-region only in `us-east-1`, `eu-west-1`, and `ap-northeast-1`. In other regions, use a cross-region inference profile ID instead: `us.cohere.embed-v4:0`, `eu.cohere.embed-v4:0`, or `global.cohere.embed-v4:0`. See the [Embed v4 model card](https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-cohere-embed-v4.html).
@@ -101,7 +102,7 @@ Both AWS Bedrock embedding providers have the same create form fields.
 ### Advanced configurations
 
 <ThemedImage
-    alt="Bedrock Cohere Create Embedding Provider form with Advanced Configurations expanded, scrolled to show Truncate, Dimensions, Additional Model Request Fields, Retry Config, and HTTP Config, followed by Embedding Provider Name bedrockCohereembeddingprovider and Result Type bedrock:CohereEmbeddingProvider."
+    alt="Bedrock Cohere Create Embedding Provider form scrolled to Input Type (select/expression toggle, value SEARCH_DOCUMENT, hint 'SEARCH_DOCUMENT for the corpus, SEARCH_QUERY for queries'), then Advanced Configurations expanded showing Truncate, Dimensions, Additional Model Request Fields, Retry Config, and HTTP Config, followed by Embedding Provider Name bedrockCohereembeddingprovider."
     sources={{
         light: useBaseUrl('/img/genai/develop/components/embedding-providers/12-aws-bedrock-cohere-advanced-v5.1.0.png'),
         dark: useBaseUrl('/img/genai/develop/components/embedding-providers/12-aws-bedrock-cohere-advanced-v5.1.0.png'),
@@ -110,7 +111,6 @@ Both AWS Bedrock embedding providers have the same create form fields.
 
 | Field | Provider | Default | Available values | What it controls |
 |---|---|---|---|---|
-| **Input Type** | Cohere | `SEARCH_DOCUMENT` | `SEARCH_DOCUMENT`, `SEARCH_QUERY`, `CLASSIFICATION`, `CLUSTERING` | What the embeddings are for. Cohere requires this on every request. |
 | **Truncate** | Cohere | `()` (model default) | `TRUNCATE_NONE`, `TRUNCATE_START`, `TRUNCATE_END` | How over-long input is handled. `TRUNCATE_NONE` returns an error; the other two drop tokens from the start or the end. |
 | **Dimensions** | Both | `()` (model default) | Titan V2: `256`, `512`, `1024`. Cohere Embed v4: `256`, `512`, `1024`, `1536`. | Output vector size. Must match the dimension of your vector store index. Setting it on Titan V1 or Cohere Embed v3 fails when the provider is created. |
 | **Normalize** | Titan | `()` (`true` on Titan V2) | `true`, `false` | Whether Titan returns a unit-length vector. |
