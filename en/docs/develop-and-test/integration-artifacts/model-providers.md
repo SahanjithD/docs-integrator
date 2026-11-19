@@ -74,7 +74,7 @@ Scroll to see the remaining options:
 | **Azure OpenAI** | [`ballerinax/ai.azure`](https://central.ballerina.io/ballerinax/ai.azure/latest) | Yes | Yes |
 | **DeepSeek** | [`ballerinax/ai.deepseek`](https://central.ballerina.io/ballerinax/ai.deepseek/latest) | Yes | No |
 | **Google Vertex** | [`ballerinax/ai.googleapis.vertex`](https://central.ballerina.io/ballerinax/ai.googleapis.vertex/latest) | OAuth2 / service account | Yes |
-| **Mistral** | [`ballerinax/ai.mistral`](https://central.ballerina.io/ballerinax/ai.mistral/latest) | Yes | No |
+| **Mistral** | [`ballerinax/ai.mistral`](https://central.ballerina.io/ballerinax/ai.mistral/latest) | Yes | Yes |
 | **Ollama** | [`ballerinax/ai.ollama`](https://central.ballerina.io/ballerinax/ai.ollama/latest) | No (local) | No |
 | **OpenAI** | [`ballerinax/ai.openai`](https://central.ballerina.io/ballerinax/ai.openai/latest) | Yes | Yes |
 | **OpenRouter** | [`ballerinax/ai.openrouter`](https://central.ballerina.io/ballerinax/ai.openrouter/latest) | Yes | Yes |
@@ -524,6 +524,10 @@ Scrolling further shows Timeout, Forwarded, Compression, Payload Validation, the
 ### Advanced configurations
 
 Expanding **Advanced Configurations** shows the exact same panel as the [Standard HTTP advanced configurations](#standard-http-advanced-configurations) section above. Mistral adds no provider-specific fields here.
+
+:::info
+The Mistral package also ships an **Embedding Provider**. See [Mistral](knowledge-bases/embedding-providers.md#mistral).
+:::
 
 ## Ollama
 

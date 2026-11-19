@@ -2,8 +2,8 @@
 sidebar_position: 6
 sidebar_label: Embedding Providers
 title: Embedding Providers for Embedding Models
-description: Reference for every embedding provider in WSO2 Agent Builder, covering create form fields, advanced configurations, defaults, and supported embedding models for the Default WSO2 provider, AWS Bedrock, OpenAI, Azure OpenAI, Google Vertex, and OpenRouter.
-keywords: [wso2 agent builder, embedding provider, embedding model, vector, knowledge base, aws bedrock, amazon titan, cohere, openai, azure openai, google vertex, openrouter]
+description: Reference for every embedding provider in WSO2 Agent Builder, covering create form fields, advanced configurations, defaults, and supported embedding models for the Default WSO2 provider, AWS Bedrock, OpenAI, Azure OpenAI, Google Vertex, Mistral, and OpenRouter.
+keywords: [wso2 agent builder, embedding provider, embedding model, vector, knowledge base, aws bedrock, amazon titan, cohere, openai, azure openai, google vertex, mistral, mistral-embed, codestral-embed, openrouter]
 slug: /develop-and-test/integration-artifacts/knowledge-bases/embedding-providers
 ---
 
@@ -42,6 +42,8 @@ You rarely call these directly. Knowledge Base `ingest` and `retrieve` operation
     }}
 />
 
+<!-- TODO: retake the Select Embedding Provider picker screenshot so it includes the Mistral Embedding Provider card — /img/genai/develop/components/embedding-providers/01-select-embedding-provider-v1.0.png -->
+
 ## Supported embedding providers
 
 | Provider | Module | API key required? | Default model |
@@ -50,6 +52,7 @@ You rarely call these directly. Knowledge Base `ingest` and `retrieve` operation
 | **AWS Bedrock** | [`ballerinax/ai.aws.bedrock`](https://central.ballerina.io/ballerinax/ai.aws.bedrock/latest) | AWS credentials or a Bedrock API key | None |
 | **Azure OpenAI** | [`ballerinax/ai.azure`](https://central.ballerina.io/ballerinax/ai.azure/latest) | Yes | None |
 | **Google Vertex** | [`ballerinax/ai.googleapis.vertex`](https://central.ballerina.io/ballerinax/ai.googleapis.vertex/latest) | OAuth2 / service account | `text-embedding-005` |
+| **Mistral** | [`ballerinax/ai.mistral`](https://central.ballerina.io/ballerinax/ai.mistral/latest) | Yes | None |
 | **OpenAI** | [`ballerinax/ai.openai`](https://central.ballerina.io/ballerinax/ai.openai/latest) | Yes | None |
 | **OpenRouter** | [`ballerinax/ai.openrouter`](https://central.ballerina.io/ballerinax/ai.openrouter/latest) | Yes | None |
 
@@ -209,6 +212,50 @@ Scrolling further shows Timeout, Forwarded, Compression, and Payload Validation,
 
 Expanding **Advanced Configurations** shows the exact same panel as the [Standard HTTP advanced configurations](../model-providers.md#standard-http-advanced-configurations) section on the Model Providers page. Vertex adds no provider-specific fields here.
 
+## Mistral
+
+Connects to Mistral AI's hosted embedding models: `mistral-embed` for general text and `codestral-embed` for code. The same `ballerinax/ai.mistral` package also provides the [Mistral model provider](../model-providers.md#mistral). The embedding provider is available from version 1.3.0 of the package.
+
+Official website: [Mistral AI embeddings documentation](https://docs.mistral.ai/capabilities/embeddings/).
+
+### Create form
+
+The form opens with **API Key**, **Embedding Model Type**, **Service URL**, **Output Dimension**, and **Output Data Type**, followed by **HTTP Version** and **Timeout**:
+
+<!-- TODO: add Mistral embedding provider create form screenshot — /img/genai/develop/components/embedding-providers/13-mistral-basic-v1.0.png (Create Embedding Provider form for Mistral. Header reads 'Initializes the Mistral AI embedding model with the given connection configuration.' Fields shown: API Key, Embedding Model Type (No Selection), Service URL (default https://api.mistral.ai/v1), Output Dimension (empty), Output Data Type (No Selection), HTTP Version (default HTTP_2_0), and Timeout (default 60).) -->
+
+| Field | Required | Default | Available values |
+|---|---|---|---|
+| **API Key** | Yes | N/A | The Mistral AI API key. Get one from the [Mistral AI console](https://console.mistral.ai/api-keys). |
+| **Embedding Model Type** | Yes | N/A | `MISTRAL_EMBED` (`mistral-embed`), `MISTRAL_EMBED_2312` (`mistral-embed-2312`), `CODESTRAL_EMBED` (`codestral-embed`), `CODESTRAL_EMBED_2505` (`codestral-embed-2505`). The Mistral AI embedding model name. |
+| **Service URL** | No | `https://api.mistral.ai/v1` | The base URL of the Mistral AI API endpoint. |
+| **Output Dimension** | No | `()` | A positive integer, or empty to use the model default (1024 for `mistral-embed`, 1536 for `codestral-embed`). `codestral-embed` supports up to 3072. |
+| **Output Data Type** | No | `()` | `EMBEDDING_FLOAT` (`float`), `EMBEDDING_INT8` (`int8`), `EMBEDDING_UINT8` (`uint8`), or empty to use `float`. Integer values are returned as floating-point numbers with the same values. |
+
+Scrolling further shows **Forwarded**, **Compression**, and **Payload Validation**, then the collapsed **Advanced Configurations** toggle, and finally **Embedding Provider Name** and **Result Type**:
+
+<!-- TODO: add Mistral embedding provider form bottom screenshot — /img/genai/develop/components/embedding-providers/14-mistral-inline-bottom-v1.0.png (Bottom of the Mistral Create Embedding Provider form showing the end of Timeout, then Forwarded (default disable), Compression (default AUTO), Payload Validation (default true), the collapsed Advanced Configurations toggle, Embedding Provider Name set to mistralEmbeddingprovider, Result Type locked to mistral:EmbeddingProvider, and the Save button.) -->
+
+The connection fields on the form are optional and have these defaults:
+
+| Field | Default | Available values |
+|---|---|---|
+| **HTTP Version** | `HTTP_2_0` | The HTTP version understood by the client. |
+| **Timeout** | `60` | The maximum time to wait (in seconds) for a response before closing the connection. |
+| **Forwarded** | `"disable"` | The choice of setting the `forwarded`/`x-forwarded` header. |
+| **Compression** | `AUTO` | `AUTO`, `ALWAYS`, `NEVER`. Specifies the way of handling the compression (`accept-encoding`) header. |
+| **Payload Validation** | `true` | `true`, `false`. Enables inbound payload validation provided by the constraint package. |
+| **Embedding Provider Name** | `mistralEmbeddingprovider` | Name of the embedding-provider connection. |
+| **Result Type** | `mistral:EmbeddingProvider` | Locked. |
+
+### Advanced configurations
+
+Expanding **Advanced Configurations** shows the exact same panel as the [Standard HTTP advanced configurations](../model-providers.md#standard-http-advanced-configurations) section on the Model Providers page. Mistral adds no provider-specific fields here.
+
+:::warning
+The Mistral embedding provider accepts text-only chunks. Image or audio chunks raise an error. Mistral documents **Output Dimension** and **Output Data Type** only for `codestral-embed`. Match **Output Dimension** to the dimension of your vector store.
+:::
+
 ## OpenAI
 
 Connects to OpenAI's hosted embedding models.
@@ -315,6 +362,7 @@ OpenRouter's embedding endpoint accepts text-only chunks. Image or audio chunks 
 | Already on AWS | **AWS Bedrock**: IAM credentials, and requests stay in the AWS region you choose, unless you use a cross-region inference profile ID such as `us.cohere.embed-v4:0`. |
 | Already on Azure | **Azure OpenAI**: keep traffic inside your Azure tenant. |
 | Already on Google Cloud | **Vertex**: same auth as the rest of GCP. |
+| Already using Mistral models, or embedding source code | **Mistral**: use your existing Mistral API key; `codestral-embed` is tuned for code. |
 | Already using OpenAI models | **OpenAI**: use your existing OpenAI API key. |
 | Want one key across many vendors | **OpenRouter**. |
 
