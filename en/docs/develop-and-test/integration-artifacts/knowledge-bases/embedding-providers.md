@@ -2,8 +2,8 @@
 sidebar_position: 6
 sidebar_label: Embedding Providers
 title: Embedding Providers for Embedding Models
-description: Reference for every embedding provider in WSO2 Agent Builder, covering create form fields, advanced configurations, defaults, and supported embedding models for the Default WSO2 provider, AWS Bedrock, OpenAI, Azure OpenAI, Google Vertex, and OpenRouter.
-keywords: [wso2 agent builder, embedding provider, embedding model, vector, knowledge base, aws bedrock, amazon titan, cohere, openai, azure openai, google vertex, openrouter]
+description: Reference for every embedding provider in WSO2 Agent Builder, covering create form fields, advanced configurations, defaults, and supported embedding models for the Default WSO2 provider, AWS Bedrock, OpenAI, Azure OpenAI, Google Vertex, OpenRouter, and Voyage AI.
+keywords: [wso2 agent builder, embedding provider, embedding model, vector, knowledge base, aws bedrock, amazon titan, cohere, openai, azure openai, google vertex, openrouter, voyage ai]
 slug: /develop-and-test/integration-artifacts/knowledge-bases/embedding-providers
 ---
 
@@ -42,6 +42,8 @@ You rarely call these directly. Knowledge Base `ingest` and `retrieve` operation
     }}
 />
 
+<!-- TODO: retake the Select Embedding Provider picker screenshot so it includes the Voyage Embedding Provider card — /img/genai/develop/components/embedding-providers/01-select-embedding-provider-v1.0.png -->
+
 ## Supported embedding providers
 
 | Provider | Module | API key required? | Default model |
@@ -52,6 +54,7 @@ You rarely call these directly. Knowledge Base `ingest` and `retrieve` operation
 | **Google Vertex** | [`ballerinax/ai.googleapis.vertex`](https://central.ballerina.io/ballerinax/ai.googleapis.vertex/latest) | OAuth2 / service account | `text-embedding-005` |
 | **OpenAI** | [`ballerinax/ai.openai`](https://central.ballerina.io/ballerinax/ai.openai/latest) | Yes | None |
 | **OpenRouter** | [`ballerinax/ai.openrouter`](https://central.ballerina.io/ballerinax/ai.openrouter/latest) | Yes | None |
+| **Voyage AI** | [`ballerinax/ai.voyage`](https://central.ballerina.io/ballerinax/ai.voyage/latest) | Yes | None |
 
 :::info
 The HTTP-level advanced configurations on every external embedding provider use the same set of fields as model providers. For the full reference, see [Standard HTTP advanced configurations](../model-providers.md#standard-http-advanced-configurations).
@@ -307,6 +310,59 @@ Expanding **Advanced Configurations** shows the exact same panel as the [Standar
 OpenRouter's embedding endpoint accepts text-only chunks. Image or audio chunks raise an error.
 :::
 
+## Voyage AI
+
+Voyage AI serves embedding models built for retrieval, including general-purpose, code, finance, and legal models.
+
+Official website: [Voyage AI embeddings documentation](https://docs.voyageai.com/docs/embeddings).
+
+### Create form
+
+The form opens with **API Key**, **Embedding Model Type**, **Service URL**, **Output Dimension**, **Input Type**, **Output Data Type**, and **Truncate Long Inputs**, followed by the start of **HTTP Version**:
+
+<!-- TODO: add Voyage AI Create Embedding Provider form screenshot showing API Key, Embedding Model Type, Service URL (default https://api.voyageai.com/v1), Output Dimension, Input Type, Output Data Type (default FLOAT), Truncate Long Inputs (default true), and the start of HTTP Version — /img/genai/develop/components/embedding-providers/13-voyage-basic-v1.0.png -->
+
+| Field | Required | Default | Available values |
+|---|---|---|---|
+| **API Key** | Yes | N/A | The Voyage AI API key. Get one from the [Voyage AI dashboard](https://dashboard.voyageai.com/organization/api-keys). MongoDB Atlas keys (starting with `al-`) also work. |
+| **Embedding Model Type** | Yes | N/A | `VOYAGE_4_LARGE` (`voyage-4-large`), `VOYAGE_4` (`voyage-4`), `VOYAGE_4_LITE` (`voyage-4-lite`), `VOYAGE_CODE_4` (`voyage-code-4`), and the legacy `VOYAGE_3_LARGE`, `VOYAGE_3_5`, `VOYAGE_3_5_LITE`, `VOYAGE_CODE_3`, `VOYAGE_FINANCE_2`, `VOYAGE_LAW_2`. Any other Voyage model ID is also accepted as a string. |
+| **Service URL** | No | `https://api.voyageai.com/v1` | The base URL of the Voyage AI API. With an `al-` key and the default URL, requests go to `https://ai.mongodb.com/v1`. |
+| **Output Dimension** | No | `()` (model default, 1024) | `256`, `512`, `1024`, `2048`. Output vector size. Must match the dimension of your vector store index. `voyage-finance-2` and `voyage-law-2` have a fixed 1024 dimension; setting it on them fails when the provider is created. |
+| **Input Type** | No | `()` (set per call) | `QUERY`, `DOCUMENT`. What the embeddings are for. When unset, **Embed** sends `query` and **Batch Embed** sends `document`. When set, every call uses that value. |
+| **Output Data Type** | No | `FLOAT` | `FLOAT`, `INT8`, `UINT8`. Value type of the embedding. `INT8` and `UINT8` values are returned as whole-number floats. `voyage-finance-2` and `voyage-law-2` support `FLOAT` only. |
+| **Truncate Long Inputs** | No | `true` | `true`, `false`. Whether inputs longer than the model's context length are truncated. `false` returns an error instead. |
+
+Scrolling further shows **Timeout**, **Forwarded**, **Compression**, and **Payload Validation**, then the collapsed **Advanced Configurations** toggle, and finally **Embedding Provider Name** and **Result Type**:
+
+<!-- TODO: add bottom of the Voyage AI Create Embedding Provider form screenshot showing Timeout, Forwarded, Compression, Payload Validation, the collapsed Advanced Configurations toggle, Embedding Provider Name, Result Type locked to voyage:EmbeddingProvider, and the Save button — /img/genai/develop/components/embedding-providers/14-voyage-inline-bottom-v1.0.png -->
+
+The connection fields on the form are optional and have these defaults:
+
+| Field | Default | Available values |
+|---|---|---|
+| **HTTP Version** | `HTTP_2_0` | The HTTP version understood by the client. |
+| **Timeout** | `60` | The maximum time to wait (in seconds) for a response before closing the connection. |
+| **Forwarded** | `"disable"` | The choice of setting the `forwarded`/`x-forwarded` header. |
+| **Compression** | `AUTO` | `AUTO`, `ALWAYS`, `NEVER`. Specifies the way of handling the compression (`accept-encoding`) header. |
+| **Payload Validation** | `true` | `true`, `false`. Enables inbound payload validation provided by the constraint package. |
+| **Result Type** | `voyage:EmbeddingProvider` | Locked. |
+
+### Advanced configurations
+
+Expanding **Advanced Configurations** shows the exact same panel as the [Standard HTTP advanced configurations](../model-providers.md#standard-http-advanced-configurations) section on the Model Providers page. Voyage AI adds no provider-specific fields here.
+
+No requests are retried by default. To retry on rate limits and server errors, set **Retry Configuration** with the status codes `429`, `500`, `502`, `503`, and `504`, which Voyage AI recommends retrying.
+
+:::warning
+**Voyage AI's Input Type affects retrieval quality without raising any error.** Voyage AI recommends `document` for the content you store and `query` for search queries. In a [Vector Knowledge Base](../knowledge-bases/knowledge-bases.md#vector-knowledge-base), leave **Input Type** unset: ingest uses **Batch Embed**, which sends `document`, and retrieve uses **Embed**, which sends `query`. Setting it applies the same value to both.
+:::
+
+**Batch Embed** splits the chunks into requests of at most 1,000 chunks that stay within the model's per-request token limit, and returns the embeddings in the same order as the input chunks.
+
+:::warning
+The Voyage AI embedding provider accepts text-only chunks. Image or audio chunks raise an error.
+:::
+
 ## Selecting a provider
 
 | Situation | Recommended |
@@ -317,6 +373,7 @@ OpenRouter's embedding endpoint accepts text-only chunks. Image or audio chunks 
 | Already on Google Cloud | **Vertex**: same auth as the rest of GCP. |
 | Already using OpenAI models | **OpenAI**: use your existing OpenAI API key. |
 | Want one key across many vendors | **OpenRouter**. |
+| Want retrieval-focused models, including code, finance, and legal, or already use MongoDB Atlas | **Voyage AI**. |
 
 The provider selected at ingest time must remain consistent for the lifetime of the vector store. Switching providers requires re-embedding all stored content.
 

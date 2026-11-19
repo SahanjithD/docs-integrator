@@ -614,7 +614,7 @@ An embedding provider turns text into vectors, for both the chunks you ingest an
     }}
 />
 
-Select **Add Embedding Provider** to open the picker with the supported embedding providers: **Default Embedding Provider (WSO2)**, **Bedrock Embedding Providers**, **Azure Embedding Provider**, **Google Vertex Embedding Provider**, **OpenAI Embedding Provider**, and **OpenRouter Embedding Provider**.
+Select **Add Embedding Provider** to open the picker with the supported embedding providers: **Default Embedding Provider (WSO2)**, **Bedrock Embedding Providers**, **Azure Embedding Provider**, **Google Vertex Embedding Provider**, **OpenAI Embedding Provider**, **OpenRouter Embedding Provider**, and **Voyage Embedding Provider**.
 
 <ThemedImage
     alt="Embedding providers list with Default (WSO2), Bedrock, Azure, Google Vertex, OpenAI, and OpenRouter providers"
@@ -623,6 +623,8 @@ Select **Add Embedding Provider** to open the picker with the supported embeddin
         dark: useBaseUrl('/img/editor/canvases/flow-canvas/embedding-providers-offered-v1.0.png'),
     }}
 />
+
+<!-- TODO: retake the embedding providers list screenshot so it includes the Voyage Embedding Provider — /img/editor/canvases/flow-canvas/embedding-providers-offered-v1.0.png -->
 
 For the full reference, see [Embedding providers](../../../develop-and-test/integration-artifacts/knowledge-bases/embedding-providers.md).
 
