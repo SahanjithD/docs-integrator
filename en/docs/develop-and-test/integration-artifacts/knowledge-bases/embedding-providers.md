@@ -2,8 +2,8 @@
 sidebar_position: 6
 sidebar_label: Embedding Providers
 title: Embedding Providers for Embedding Models
-description: Reference for every embedding provider in WSO2 Agent Builder, covering create form fields, advanced configurations, defaults, and supported embedding models for the Default WSO2 provider, AWS Bedrock, OpenAI, Azure OpenAI, Google Vertex, and OpenRouter.
-keywords: [wso2 agent builder, embedding provider, embedding model, vector, knowledge base, aws bedrock, amazon titan, cohere, openai, azure openai, google vertex, openrouter]
+description: Reference for every embedding provider in WSO2 Agent Builder, covering create form fields, advanced configurations, defaults, and supported embedding models for the Default WSO2 provider, AWS Bedrock, OpenAI, Azure OpenAI, Cohere, Google Vertex, and OpenRouter.
+keywords: [wso2 agent builder, embedding provider, embedding model, vector, knowledge base, aws bedrock, amazon titan, cohere, cohere embed, embed-v5.0, openai, azure openai, google vertex, openrouter]
 slug: /develop-and-test/integration-artifacts/knowledge-bases/embedding-providers
 ---
 
@@ -42,6 +42,8 @@ You rarely call these directly. Knowledge Base `ingest` and `retrieve` operation
     }}
 />
 
+<!-- TODO: retake the Select Embedding Provider picker screenshot so it includes the Cohere Embedding Provider card — /img/genai/develop/components/embedding-providers/01-select-embedding-provider-v1.0.png -->
+
 ## Supported embedding providers
 
 | Provider | Module | API key required? | Default model |
@@ -49,6 +51,7 @@ You rarely call these directly. Knowledge Base `ingest` and `retrieve` operation
 | **Default WSO2** | `ballerina/ai` | No (signed-in via WSO2) | WSO2-managed |
 | **AWS Bedrock** | [`ballerinax/ai.aws.bedrock`](https://central.ballerina.io/ballerinax/ai.aws.bedrock/latest) | AWS credentials or a Bedrock API key | None |
 | **Azure OpenAI** | [`ballerinax/ai.azure`](https://central.ballerina.io/ballerinax/ai.azure/latest) | Yes | None |
+| **Cohere** | [`ballerinax/ai.cohere`](https://central.ballerina.io/ballerinax/ai.cohere/latest) | Yes (optional for private deployments) | `embed-v5.0-pro` |
 | **Google Vertex** | [`ballerinax/ai.googleapis.vertex`](https://central.ballerina.io/ballerinax/ai.googleapis.vertex/latest) | OAuth2 / service account | `text-embedding-005` |
 | **OpenAI** | [`ballerinax/ai.openai`](https://central.ballerina.io/ballerinax/ai.openai/latest) | Yes | None |
 | **OpenRouter** | [`ballerinax/ai.openrouter`](https://central.ballerina.io/ballerinax/ai.openrouter/latest) | Yes | None |
@@ -170,6 +173,61 @@ Scrolling further shows Timeout, Forwarded, Compression, and Payload Validation,
 ### Advanced configurations
 
 Expanding **Advanced Configurations** shows the exact same panel as the [Standard HTTP advanced configurations](../model-providers.md#standard-http-advanced-configurations) section on the Model Providers page. Azure adds no provider-specific fields here.
+
+## Cohere
+
+Connects to Cohere's Embed models, either on the Cohere platform or on a private Cohere deployment. The same `ballerinax/ai.cohere` package also provides the [Cohere model provider](../model-providers.md#cohere).
+
+Official website: [Cohere embeddings documentation](https://docs.cohere.com/docs/embeddings).
+
+### Create form
+
+The form opens with **Authentication**, **Embedding Model Type**, **Service URL**, **Input Type**, **Embedding Type**, **Output Dimension**, **Truncate**, and **Maximum Tokens per Input**, followed by the start of **HTTP Version**:
+
+<!-- TODO: add Cohere Create Embedding Provider form screenshot — /img/genai/develop/components/embedding-providers/15-cohere-basic-v1.0.png (Create Embedding Provider form for Cohere. Header reads 'Initializes the Cohere embedding provider with the given connection configuration.' Fields shown: Authentication, Embedding Model Type (default EMBED_V5_0_PRO), Service URL (default https://api.cohere.com), Input Type (No Selection), Embedding Type (default FLOAT), Output Dimension (empty), Truncate (default END), Maximum Tokens per Input (empty), and the start of HTTP Version (default HTTP_2_0).) -->
+
+| Field | Required | Default | Available values |
+|---|---|---|---|
+| **Authentication** | Yes | N/A | The Cohere API key. Get one from the [Cohere dashboard](https://dashboard.cohere.com/api-keys). Can be empty only when **Service URL** points to a private deployment. |
+| **Embedding Model Type** | No | `embed-v5.0-pro` (shown as `EMBED_V5_0_PRO`) | `EMBED_V5_0_PRO` (`embed-v5.0-pro`), `EMBED_V5_0_FAST` (`embed-v5.0-fast`), `EMBED_V4_0` (`embed-v4.0`), `EMBED_ENGLISH_V3_0` (`embed-english-v3.0`), `EMBED_MULTILINGUAL_V3_0` (`embed-multilingual-v3.0`), `EMBED_ENGLISH_LIGHT_V3_0` (`embed-english-light-v3.0`), `EMBED_MULTILINGUAL_LIGHT_V3_0` (`embed-multilingual-light-v3.0`). Any other Cohere model ID is also accepted as a string. |
+| **Service URL** | No | `https://api.cohere.com` | The base URL of the Cohere API, or of a private Cohere deployment. |
+| **Input Type** | No | `()` (set per call) | `SEARCH_DOCUMENT`, `SEARCH_QUERY`, `CLASSIFICATION`, `CLUSTERING`. What the embeddings are for. When unset, **Embed** sends `search_query` and **Batch Embed** sends `search_document`. When set, every call uses that value. |
+| **Embedding Type** | No | `FLOAT` | `FLOAT`, `INT8`, `UINT8`. Value type of the embedding. `INT8` and `UINT8` values are returned as whole-number floats. |
+| **Output Dimension** | No | `()` (model default) | `embed-v5.0-pro` and `embed-v5.0-fast`: `256`, `512`, `768`, `1024`, `1536`, `2048` (default `2048`). `embed-v4.0`: `256`, `512`, `1024`, `1536` (default `1536`). The v3 models have a fixed size (1024, or 384 for the light models), and setting it on them fails when the provider is created. Must match the dimension of your vector store index. |
+| **Truncate** | No | `END` | `NONE`, `START`, `END`. How inputs longer than the model's limit are handled. `NONE` returns an error; the other two drop tokens from the start or the end. |
+| **Maximum Tokens per Input** | No | `()` (model limit) | Any positive integer. Tokens beyond this limit are truncated as set by **Truncate**. |
+
+Scrolling further shows **Timeout**, **Forwarded**, **Compression**, and **Payload Validation**, then the collapsed **Advanced Configurations** toggle, and finally **Embedding Provider Name** and **Result Type**:
+
+<!-- TODO: add Cohere Create Embedding Provider form bottom screenshot — /img/genai/develop/components/embedding-providers/16-cohere-inline-bottom-v1.0.png (Bottom of the Cohere Create Embedding Provider form showing the end of Timeout, then Forwarded (default disable), Compression (default AUTO), Payload Validation (default true), the collapsed Advanced Configurations toggle, Embedding Provider Name set to cohereEmbeddingprovider, Result Type locked to cohere:EmbeddingProvider, and the Save button.) -->
+
+The connection fields on the form are optional and have these defaults:
+
+| Field | Default | Available values |
+|---|---|---|
+| **HTTP Version** | `HTTP_2_0` | The HTTP version understood by the client. |
+| **Timeout** | `60` | The maximum time to wait (in seconds) for a response before closing the connection. |
+| **Forwarded** | `"disable"` | The choice of setting the `forwarded`/`x-forwarded` header. |
+| **Compression** | `AUTO` | `AUTO`, `ALWAYS`, `NEVER`. Specifies the way of handling the compression (`accept-encoding`) header. |
+| **Payload Validation** | `true` | `true`, `false`. Enables inbound payload validation provided by the constraint package. |
+| **Embedding Provider Name** | `cohereEmbeddingprovider` | Name of the embedding-provider connection. |
+| **Result Type** | `cohere:EmbeddingProvider` | Locked. |
+
+### Advanced configurations
+
+Expanding **Advanced Configurations** shows the exact same panel as the [Standard HTTP advanced configurations](../model-providers.md#standard-http-advanced-configurations) section on the Model Providers page. Cohere adds no provider-specific fields here.
+
+:::warning
+**Cohere's Input Type affects retrieval quality without raising any error.** Cohere recommends `search_document` for the content you store and `search_query` for search queries. In a [Vector Knowledge Base](../knowledge-bases/knowledge-bases.md#vector-knowledge-base), leave **Input Type** unset: ingest uses **Batch Embed**, which sends `search_document`, and retrieve uses **Embed**, which sends `search_query`. Setting it applies the same value to both.
+:::
+
+**Batch Embed** sends up to 96 chunks per request and returns the embeddings in the same order as the input chunks. `embed-v5.0-pro` and `embed-v5.0-fast` share one embedding space, so you can ingest with one and retrieve with the other.
+
+For a private Cohere deployment, set **Service URL** to the deployment's base URL. If the deployment doesn't need a key, leave **Authentication** empty (`""`); no `Authorization` header is sent. See [Private deployments](../model-providers.md#cohere-private-deployments).
+
+:::warning
+The Cohere embedding provider accepts text-only chunks. Image or audio chunks raise an error.
+:::
 
 ## Google Vertex
 
@@ -314,6 +372,7 @@ OpenRouter's embedding endpoint accepts text-only chunks. Image or audio chunks 
 | Prototyping, no infra setup | **Default WSO2**: sign in once, no key needed. |
 | Already on AWS | **AWS Bedrock**: IAM credentials, and requests stay in the AWS region you choose, unless you use a cross-region inference profile ID such as `us.cohere.embed-v4:0`. |
 | Already on Azure | **Azure OpenAI**: keep traffic inside your Azure tenant. |
+| Already using Cohere models, or running a private Cohere deployment | **Cohere**: use your existing Cohere API key, or point **Service URL** at your own deployment. |
 | Already on Google Cloud | **Vertex**: same auth as the rest of GCP. |
 | Already using OpenAI models | **OpenAI**: use your existing OpenAI API key. |
 | Want one key across many vendors | **OpenRouter**. |

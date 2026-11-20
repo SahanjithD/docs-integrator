@@ -413,6 +413,7 @@ Selecting **Model Provider** lists the model providers already in the project. S
 | **Anthropic Model Provider** | Client for Anthropic Claude models. |
 | **Bedrock Model Providers** | Model providers from the `ballerinax/ai.aws.bedrock` module, grouped under one entry. |
 | **Azure OpenAI Model Provider** | Client for Azure-hosted OpenAI models. |
+| **Cohere Model Provider** | Cohere chat models for agents, tool calling and structured output. |
 | **Deepseek Model Provider** | Client for Deepseek models. |
 | **Google Vertex Model Provider** | Client for models hosted on Google Vertex AI. |
 | **Mistral Model Provider** | Client for Mistral AI models. |
@@ -427,6 +428,8 @@ Selecting **Model Provider** lists the model providers already in the project. S
         dark: useBaseUrl('/img/editor/canvases/flow-canvas/model-providers-offered-v1.0.png'),
     }}
 />
+
+<!-- TODO: retake the model providers list screenshot so it includes the Cohere Model Provider — /img/editor/canvases/flow-canvas/model-providers-offered-v1.0.png -->
 
 For provider-specific configuration, model selection, and usage patterns, see [Model providers](../../../develop-and-test/integration-artifacts/model-providers.md).
 
@@ -614,7 +617,7 @@ An embedding provider turns text into vectors, for both the chunks you ingest an
     }}
 />
 
-Select **Add Embedding Provider** to open the picker with the supported embedding providers: **Default Embedding Provider (WSO2)**, **Bedrock Embedding Providers**, **Azure Embedding Provider**, **Google Vertex Embedding Provider**, **OpenAI Embedding Provider**, and **OpenRouter Embedding Provider**.
+Select **Add Embedding Provider** to open the picker with the supported embedding providers: **Default Embedding Provider (WSO2)**, **Bedrock Embedding Providers**, **Azure Embedding Provider**, **Cohere Embedding Provider**, **Google Vertex Embedding Provider**, **OpenAI Embedding Provider**, and **OpenRouter Embedding Provider**.
 
 <ThemedImage
     alt="Embedding providers list with Default (WSO2), Bedrock, Azure, Google Vertex, OpenAI, and OpenRouter providers"
@@ -623,6 +626,8 @@ Select **Add Embedding Provider** to open the picker with the supported embeddin
         dark: useBaseUrl('/img/editor/canvases/flow-canvas/embedding-providers-offered-v1.0.png'),
     }}
 />
+
+<!-- TODO: retake the embedding providers list screenshot so it includes the Cohere Embedding Provider — /img/editor/canvases/flow-canvas/embedding-providers-offered-v1.0.png -->
 
 For the full reference, see [Embedding providers](../../../develop-and-test/integration-artifacts/knowledge-bases/embedding-providers.md).
 

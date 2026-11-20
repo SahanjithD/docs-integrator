@@ -3,8 +3,8 @@ sidebar_position: 5
 sidebar_custom_props: { separatorBefore: "Agent Resources" }
 sidebar_label: Model Providers
 title: Model Providers for LLMs
-description: Reference for every model provider for LLM in WSO2 Agent Builder, covering create form fields, advanced configurations, defaults, and supported models for the Default WSO2 provider, OpenAI, Azure OpenAI, Anthropic, AWS Bedrock, Google Vertex, Mistral, DeepSeek, Ollama, and OpenRouter.
-keywords: [wso2 agent builder, model provider, llm, large language model, ai, anthropic, aws bedrock, openai, azure openai, google vertex, mistral, deepseek, ollama, openrouter, gpt-5, responses api, reasoning effort]
+description: Reference for every model provider for LLM in WSO2 Agent Builder, covering create form fields, advanced configurations, defaults, and supported models for the Default WSO2 provider, OpenAI, Azure OpenAI, Anthropic, AWS Bedrock, Cohere, Google Vertex, Mistral, DeepSeek, Ollama, and OpenRouter.
+keywords: [wso2 agent builder, model provider, llm, large language model, ai, anthropic, aws bedrock, openai, azure openai, cohere, command a, google vertex, mistral, deepseek, ollama, openrouter, gpt-5, responses api, reasoning effort]
 slug: /develop-and-test/integration-artifacts/model-providers
 ---
 
@@ -64,6 +64,8 @@ Scroll to see the remaining options:
     }}
 />
 
+<!-- TODO: retake the Select Model Provider picker screenshots so they include the Cohere Model Provider card — /img/genai/develop/components/model-providers/02-select-list-top-v1.0.png and /img/genai/develop/components/model-providers/03-select-list-bottom-v1.0.png -->
+
 ## Supported model providers
 
 | Provider | Module | API key required? | Has embedding provider? |
@@ -72,6 +74,7 @@ Scroll to see the remaining options:
 | **Anthropic** | [`ballerinax/ai.anthropic`](https://central.ballerina.io/ballerinax/ai.anthropic/latest) | Yes | No |
 | **AWS Bedrock** | [`ballerinax/ai.aws.bedrock`](https://central.ballerina.io/ballerinax/ai.aws.bedrock/latest) | AWS credentials or a Bedrock API key | Yes |
 | **Azure OpenAI** | [`ballerinax/ai.azure`](https://central.ballerina.io/ballerinax/ai.azure/latest) | Yes | Yes |
+| **Cohere** | [`ballerinax/ai.cohere`](https://central.ballerina.io/ballerinax/ai.cohere/latest) | Yes (optional for private deployments) | Yes |
 | **DeepSeek** | [`ballerinax/ai.deepseek`](https://central.ballerina.io/ballerinax/ai.deepseek/latest) | Yes | No |
 | **Google Vertex** | [`ballerinax/ai.googleapis.vertex`](https://central.ballerina.io/ballerinax/ai.googleapis.vertex/latest) | OAuth2 / service account | Yes |
 | **Mistral** | [`ballerinax/ai.mistral`](https://central.ballerina.io/ballerinax/ai.mistral/latest) | Yes | No |
@@ -374,6 +377,56 @@ Expanding **Advanced Configurations** shows the exact same panel as the [Standar
 
 :::info
 The Azure package also ships an **Embedding Provider** and the **Azure AI Search Knowledge Base**. See [Azure OpenAI](knowledge-bases/embedding-providers.md#azure-openai) and [Azure AI Search](knowledge-bases/knowledge-bases.md#azure-ai-search-knowledge-base).
+:::
+
+## Cohere
+
+Cohere's Command models for chat, tool use, and retrieval-augmented generation, including the Command A reasoning, vision, and translate models. The provider calls the Cohere v2 Chat API, either on the Cohere platform or on a private Cohere deployment.
+
+Official website: [cohere.com](https://cohere.com/).
+
+### Create form
+
+The form opens with **Authentication** and **Model Type**, followed directly by the standard and provider-specific inline fields (Service URL defaulting to `https://api.cohere.com`, Maximum Tokens, Temperature, Safety Mode, Thinking, Strict Tools, HTTP Version, Timeout. No need to expand anything to see these):
+
+<!-- TODO: add Cohere Create Model Provider form screenshot — /img/genai/develop/components/model-providers/32-cohere-basic-v1.0.png (Create Model Provider form for Cohere showing Authentication, Model Type (default COMMAND_A_03_2025), Service URL (default https://api.cohere.com), Maximum Tokens (default 4096), Temperature (empty), Safety Mode (No Selection), Thinking (empty), Strict Tools (empty), and the start of HTTP Version.) -->
+
+| Field | Required | Default | Available values |
+|---|---|---|---|
+| **Authentication** | Yes | - | Cohere API key. Get one from the [Cohere dashboard](https://dashboard.cohere.com/api-keys). Can be empty only when **Service URL** points to a private deployment. |
+| **Model Type** | No | `command-a-03-2025` (shown as `COMMAND_A_03_2025`) | `command-a-plus-05-2026`, `command-a-03-2025`, `command-a-reasoning-08-2025`, `command-a-vision-07-2025`, `command-a-translate-08-2025`, `command-r7b-12-2024`, `command-r-plus-08-2024`, `command-r-08-2024`. Any other Cohere model ID is also accepted as a string. See Cohere's [model list](https://docs.cohere.com/v2/docs/models). |
+
+The provider-specific inline fields, and the standard inline fields whose defaults differ for Cohere:
+
+| Field | Default | Available values | What it controls |
+|---|---|---|---|
+| **Service URL** | `https://api.cohere.com` | URL string | The base URL of the Cohere API, or of a private Cohere deployment. See [Private deployments](#cohere-private-deployments). |
+| **Maximum Tokens** | `4096` | Any positive integer | Hard cap on the response length. On reasoning models, reasoning tokens count toward this limit. |
+| **Temperature** | `()` (model's default) | `0.0` or more, or empty | Sampling temperature. |
+| **Safety Mode** | `()` (Cohere uses `CONTEXTUAL`) | `CONTEXTUAL`, `STRICT`, `OFF` | The safety instructions Cohere adds to the request. Applies only to requests with no tools, so agents and typed **Generate** calls don't send it. `OFF` is rejected by `command-r7b-12-2024` and newer models. See [Safety modes](https://docs.cohere.com/v2/docs/safety-modes). |
+| **Thinking** | `()` (model's default) | `type` (`ENABLED`, `DISABLED`), optional `tokenBudget` (at least 1) | Turns reasoning on or off for reasoning models and caps the tokens spent on it. See [Reasoning](https://docs.cohere.com/docs/reasoning). |
+| **Strict Tools** | `()` (Cohere's default) | `true`, `false` | Makes tool calls follow the tool definitions exactly. Sent only when the request has tools, so it applies to agents. |
+
+Scrolling further shows Timeout, Forwarded, Compression, Payload Validation, then the collapsed **Advanced Configurations** toggle, and finally **Model Provider Name** and **Result Type**:
+
+<!-- TODO: add Cohere Create Model Provider form bottom screenshot — /img/genai/develop/components/model-providers/33-cohere-inline-bottom-v1.0.png (Bottom of the Cohere Create Model Provider form showing Timeout (default 60), Forwarded, Compression, Payload Validation, the collapsed Advanced Configurations toggle, Model Provider Name set to cohereModelprovider, and Result Type locked to cohere:ModelProvider.) -->
+
+### Advanced configurations
+
+Expanding **Advanced Configurations** shows the exact same panel as the [Standard HTTP advanced configurations](#standard-http-advanced-configurations) section above. Cohere adds no provider-specific fields here.
+
+### Private deployments {#cohere-private-deployments}
+
+To use a private Cohere deployment, set **Service URL** to the deployment's base URL. If the deployment doesn't need a key, leave **Authentication** empty (`""`); no `Authorization` header is sent. An empty **Authentication** with the default `https://api.cohere.com` URL fails when the provider is created. See [Private deployment usage](https://docs.cohere.com/docs/private-deployment-usage).
+
+:::note
+`command-a-reasoning-08-2025` and `command-a-plus-05-2026` reason by default, and the reasoning counts toward **Maximum Tokens**. If the limit is reached before the model writes an answer, the call returns an error. For these models, raise **Maximum Tokens** (for example to `32000`) and **Timeout** (for example to `300`), because long reasoning can take more than 60 seconds.
+
+**Chat** messages are text only. **Generate** prompts can also include image documents, given as a URL or as bytes with `metadata.mimeType`; use a vision model (`command-a-vision-07-2025` or `command-a-plus-05-2026`) for those. Citations and reasoning content are not returned.
+:::
+
+:::info
+The Cohere package also ships an **Embedding Provider**. See [Cohere](knowledge-bases/embedding-providers.md#cohere).
 :::
 
 ## DeepSeek
@@ -763,7 +816,7 @@ Editing follows the same pattern for every component type. Embedding providers, 
 
 ## What's next
 
-- [Embedding providers](knowledge-bases/embedding-providers.md) — Vector embeddings for RAG. The OpenAI, Azure, AWS Bedrock, Vertex, OpenRouter, and Default WSO2 packages also ship embedding providers.
+- [Embedding providers](knowledge-bases/embedding-providers.md) — Vector embeddings for RAG. The OpenAI, Azure, AWS Bedrock, Cohere, Vertex, OpenRouter, and Default WSO2 packages also ship embedding providers.
 - [Vector stores](knowledge-bases/vector-stores.md) — Persist and query embeddings using Pinecone, Weaviate, Qdrant, pgvector, and other backends.
 - [Knowledge Bases](knowledge-bases/knowledge-bases.md) — Managed retrieval sources, including Azure AI Search, that plug directly into RAG flows.
 - [Chunkers](knowledge-bases/chunkers.md) — Split documents into chunks before embedding for ingestion into a vector store.
